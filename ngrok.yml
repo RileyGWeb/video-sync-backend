@@ -1,0 +1,7 @@
+tunnels:
+  api:
+    proto: http
+    addr: 8000
+  reverb:
+    proto: http
+    addr: 6001

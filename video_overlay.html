@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitch Video Overlay Extension</title>
+    
+    <!-- Twitch Extension Helper script - must be first -->
+    <script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            font-family: Arial, sans-serif;
+        }
+        
+        #app {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main app container -->
+    <div id="app"></div>
+    
+    <!-- Future JS app will be mounted to the #app div above -->
+    <script>
+        // Your JS app initialization will go here
+        console.log('Twitch Extension Helper loaded:', typeof window.Twitch !== 'undefined');
+    </script>
+</body>
+</html>
