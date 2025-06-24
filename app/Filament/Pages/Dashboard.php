@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\VideoSyncStatsWidget;
 use Filament\Pages\Page;
 use Illuminate\Contracts\Support\Htmlable;
 
@@ -22,5 +23,12 @@ class Dashboard extends Page
     public function getHeading(): string|Htmlable
     {
         return 'Video Sync Dashboard';
+    }
+
+    public function getHeaderWidgets(): array
+    {
+        return [
+            VideoSyncStatsWidget::class,
+        ];
     }
 }
