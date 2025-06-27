@@ -1,15 +1,85 @@
-version: '3.9'
 services:
-  db:
-    image: timescale/timescaledb:latest-pg15            # Official PG15 + Timescale
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: videosync-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/sites-available/default
+      - ./docker/supervisor/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
+    ports:
+      - "8000:80"
+      - "6001:6001"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - DB_CONNECTION=pgsql
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=videosync
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=secret
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REVERB_HOST=0.0.0.0
+      - REVERB_PORT=6001
+    networks:
+      - videosync-network
+
+  postgres:
+    image: timescale/timescaledb:latest-pg15
+    container_name: videosync-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_DB: videosync
-      POSTGRES_USER: vsync_dev
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: secret
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - videosync-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: videosync-redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - videosync-network
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: videosync-ngrok
+    restart: unless-stopped
+    command:
+      - "start"
+      - "--all"
+      - "--config"
+      - "/etc/ngrok.yml"
+    volumes:
+      - ./ngrok.yml:/etc/ngrok.yml
+    ports:
+      - "4040:4040"
+    depends_on:
+      - app
+    networks:
+      - videosync-network
 
 volumes:
-  db_data:
+  postgres_data:
+  redis_data:
+
+networks:
+  videosync-network:
+    driver: bridge

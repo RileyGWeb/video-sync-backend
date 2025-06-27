@@ -1,7 +1,8 @@
+version: "2"
 tunnels:
   api:
     proto: http
-    addr: 8000
+    addr: app:80
   reverb:
     proto: http
-    addr: 6001
+    addr: app:6001
