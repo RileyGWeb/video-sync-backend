@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TwitchOverlayController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,7 @@ Route::get('/user', function (Request $request) {
 
 Route::get('/ping', fn () => ['pong' => true]); // No auth
 
-Route::middleware(['twitch.jwt'])->group(function () {
-    Route::get('/secure', fn () => ['secure' => true]); // JWT required
+Route::middleware('twitch.jwt')->group(function () {
+    Route::post('/sync', [TwitchOverlayController::class, 'sync']);
+    Route::get('/ping', fn () => ['pong' => true]); // still unauthenticated
 });

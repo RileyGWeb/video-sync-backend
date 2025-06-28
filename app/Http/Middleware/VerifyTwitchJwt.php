@@ -10,29 +10,22 @@ use Firebase\JWT\Key;
 
 class VerifyTwitchJwt
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next)
     {
-        $token = $request->bearerToken();
-        if (! $token) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+        $authHeader = $request->header('Authorization');
+
+        if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
+            return response()->json(['error' => 'Missing or invalid Authorization header'], 401);
         }
 
+        $jwt = substr($authHeader, 7);
+        $secret = config('services.twitch.extension_secret'); // add this to your config/services.php
+
         try {
-            $secret  = config('services.twitch.client_secret');   // put this in config/services.php
-            $payload = JWT::decode($token, new Key($secret, 'HS256'));
-
-            // Optionally validate channel_id, user_id, etc. here…
-
-            // Share the payload with controllers if you like:
-            $request->attributes->set('twitchJwt', $payload);
-
-        } catch (\Throwable $e) {
-            return response()->json(['message' => 'Invalid token'], 401);
+            $payload = JWT::decode($jwt, new Key($secret, 'HS256'));
+            $request->merge(['twitch_user' => (array) $payload]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'JWT validation failed: ' . $e->getMessage()], 401);
         }
 
         return $next($request);
