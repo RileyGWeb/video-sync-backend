@@ -24,15 +24,20 @@
 </head>
 <body>
     <!-- Main app container -->
-    <div id="app"></div>
+    <div id="app">test</div>
     
     <!-- Future JS app will be mounted to the #app div above -->
     <script>
-        // Your JS app initialization will go here
+            console.log('Extension booted');
+
+    setInterval(() => {
+        console.log('heartbeat');
+    }, 3000);
+
         console.log('Twitch Extension Helper loaded:', typeof window.Twitch !== 'undefined');
 
         Twitch.ext.onAuthorized(function(auth) {
-            fetch("https://4c88-2603-90d8-401-714b-9005-4c3a-c12e-31dc.ngrok-free.app/api/ping")
+            fetch("https://b6ff-98-146-247-34.ngrok-free.app/api/ping")
                 .then(res => res.json())
                 .then(data => console.log("Pinged!", data))
                 .catch(err => console.error("Ping failed", err));

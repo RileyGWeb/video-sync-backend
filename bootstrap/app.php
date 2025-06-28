@@ -20,7 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // 2.  Append your JWT middleware to the **api** group
         $middleware->api(append: [
-            VerifyTwitchJwt::class,
+            // VerifyTwitchJwt::class, // This was applying to all api routes
         ]);
 
         // 3.  Optionally register a short alias for route use

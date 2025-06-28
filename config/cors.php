@@ -20,8 +20,8 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins'  => [
-        'https://4c88-2603-90d8-401-714b-9005-4c3a-c12e-31dc.ngrok-free.app/',          // dev tunnel
-        'https://b036-2603-90d8-401-714b-9005-4c3a-c12e-31dc.ngrok-free.app/',
+        'https://b6ff-98-146-247-34.ngrok-free.app/',          // dev tunnel
+        'https://3643-98-146-247-34.ngrok-free.app/',
         // 'https://api.yourdomain.com',      // production API
     ],
 
