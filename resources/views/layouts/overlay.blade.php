@@ -7,6 +7,7 @@
         <title>{{ $title ?? 'Player Overlay' }}</title>
 
         @livewireStyles
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body>
         {{ $slot }}

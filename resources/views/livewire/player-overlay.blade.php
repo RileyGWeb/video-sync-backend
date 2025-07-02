@@ -1,57 +1,93 @@
-<div 
-    x-data
-    x-on:log.window="console.log('Received log event:', $event.detail)"
->
-    {{-- Because she competes with no one, no one can compete with her. --}}
+<div
+    x-data="{
+        player: null,
+        currentVideoId: 'M7lc1UVf-VE',
+        csrfToken: '{{ csrf_token() }}',
 
-    <script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
-    <script src="https://www.youtube.com/iframe_api"></script>
-
-    <script>
-        let player;
-
-        function onYouTubeIframeAPIReady() {
-            player = new YT.Player('player', {
+        initPlayer() {
+            this.player = new YT.Player('player', {
                 height: '100%',
                 width: '100%',
-                videoId: 'dQw4w9WgXcQ', // Replace this with a test video ID
-                events: {
-                    'onReady': (event) => {
-                        console.log('YT Player ready');
-                    },
-                    'onStateChange': (event) => {
-                        console.log('YT Player state changed:', event.data);
-                    }
-                }
+                videoId: this.currentVideoId,
+                playerVars: { origin: location.origin, rel: 0, playsinline: 1 },
+                events: { 'onReady': () => console.log('YT Player ready') }
             });
+        },
+
+        updatePlayer(videoId, startTime) {
+            console.log(`Updating player to ${videoId} at ${startTime}s`);
+            if (this.player && typeof this.player.loadVideoById === 'function') {
+                this.currentVideoId = videoId;
+                this.player.loadVideoById({ videoId: videoId, startSeconds: startTime });
+            } else {
+                console.error('Player not initialized or invalid for update.');
+            }
+        },
+
+        sync() {
+            if (!this.player) return console.error('Player not ready for sync');
+            const currentTime = this.player.getCurrentTime();
+            const videoId = this.currentVideoId;
+            console.log(`Sending sync request for ${videoId} at ${currentTime}s`);
+
+            fetch('/api/sync-video', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': this.csrfToken
+                },
+                body: JSON.stringify({ videoId: videoId, startTime: currentTime })
+            })
+            .then(response => response.json())
+            .then(data => console.log('Sync response:', data));
+        }
+    }"
+    x-init="() => {
+        // — YT player bootstrap —
+        window.onYouTubeIframeAPIReady = () => {
+            initPlayer();
+        };
+
+        // — Echo wiring —
+        const attachEchoListener = () => {
+            if (!window.Echo) {
+                console.warn('Echo not ready, listening for echo:ready');
+                window.addEventListener('echo:ready', attachEchoListener, { once: true });
+                return;
+            }
+
+            console.log('Attaching Echo listener');
+            window.Echo.channel('video-sync')
+                .listen('.PlayVideo', e => {
+                    console.log('PlayVideo event received', e);
+                    updatePlayer(e.videoId, e.startTime);
+                });
         }
 
-        window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+        // Initial call in case Echo is already ready
+        attachEchoListener();
 
-        window.addEventListener('livewire:load', () => {
-            Livewire.on('syncVideo', () => {
-                console.log('Livewire → Sync clicked');
-                if (player) player.seekTo(0);
-            });
-
-            Livewire.on('skipVote', () => {
-                console.log('Livewire → Skip Vote clicked');
-                if (player) player.seekTo(player.getCurrentTime() + 10);
-            });
-        });
-    </script>
-
+        // Load YT API if not already loaded
+        if (!window.YT) {
+            var tag = document.createElement('script');
+            tag.src = 'https://www.youtube.com/iframe_api';
+            var firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        } else if (typeof onYouTubeIframeAPIReady !== 'undefined') {
+            onYouTubeIframeAPIReady();
+        }
+    }"
+    wire:key="player-overlay"
+    data-id="player-overlay-component"
+>
+    <script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
+    
     <style>
-        #player {
-            width: 100%;
-            height: 360px;
-            background: black;
-        }
+        #player { width:100%; height:360px; background:black; }
     </style>
 
+    <div id="player" wire:ignore></div>
 
-    <div id="player"></div>
-
-    <button wire:click="syncVideo">Sync</button>
+    <button x-on:click="sync()">Sync</button>
     <button wire:click="skipVote">Skip Vote</button>
 </div>

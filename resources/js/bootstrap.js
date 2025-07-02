@@ -1,27 +1,21 @@
-import axios from 'axios';
-window.axios = axios;
+import axios from 'axios'
+window.axios = axios
+window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 
-window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
 
-/**
- * Echo exposes an expressive API for subscribing to channels and listening
- * for events that are broadcast by Laravel. Echo and event broadcasting
- * allow your team to quickly build robust real-time web applications.
- */
-
-import './echo';
-
-import Echo from 'laravel-echo'
-window.Pusher = require('pusher-js')
+window.Pusher = Pusher;
 
 window.Echo = new Echo({
-  broadcaster: 'pusher',
-  key: import.meta.env.VITE_PUSHER_APP_KEY,           // “local”
-  cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,   // “mt1”
-  wsHost: import.meta.env.VITE_PUSHER_HOST,           // your ngrok host
-  wsPort: import.meta.env.VITE_PUSHER_PORT,           // 6001
-  wssPort: import.meta.env.VITE_PUSHER_PORT,
-  forceTLS: true,
-  encrypted: true,
-  enabledTransports: ['ws', 'wss'],
-})
+    broadcaster: 'reverb',
+    key: 'video-sync-app',
+    wsHost: '4cc5-134-215-236-18.ngrok-free.app',
+    wsPort: 443,
+    wssPort: 443,
+    forceTLS: true,
+    encrypted: true,
+    enabledTransports: ['ws', 'wss'],
+});
+
+document.dispatchEvent(new Event('echo:ready'));

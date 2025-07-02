@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Default Broadcaster
@@ -29,7 +28,6 @@ return [
     */
 
     'connections' => [
-
         'reverb' => [
             'driver' => 'reverb',
             'key' => env('REVERB_APP_KEY'),
@@ -41,6 +39,14 @@ return [
                 'scheme' => env('REVERB_SCHEME', 'https'),
                 'useTLS' => env('REVERB_SCHEME', 'https') === 'https',
             ],
+
+            // 'options' => [
+            //     // Hardcoded to test
+            //     'host' => '4cc5-134-215-236-18.ngrok-free.app',
+            //     'port' => 443,
+            //     'scheme' => 'https',
+            //     'useTLS' => true,
+            // ],
             'client_options' => [
                 // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html
             ],
@@ -76,7 +82,5 @@ return [
         'null' => [
             'driver' => 'null',
         ],
-
     ],
-
 ];

@@ -37,7 +37,7 @@
         console.log('Twitch Extension Helper loaded:', typeof window.Twitch !== 'undefined');
 
         Twitch.ext.onAuthorized(function(auth) {
-            fetch("https://b6ff-98-146-247-34.ngrok-free.app/api/ping")
+            fetch("https://a316-134-215-236-18.ngrok-free.app/api/ping")
                 .then(res => res.json())
                 .then(data => console.log("Pinged!", data))
                 .catch(err => console.error("Ping failed", err));
